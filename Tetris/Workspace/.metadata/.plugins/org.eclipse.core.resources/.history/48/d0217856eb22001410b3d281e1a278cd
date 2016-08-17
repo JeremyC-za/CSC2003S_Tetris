@@ -1,0 +1,739 @@
+package com.mygdx.game;
+
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import java.util.Random;
+public class MyGdxGame extends ApplicationAdapter {
+	SpriteBatch batch;
+
+	Texture cursor;
+	float cursorX;
+	float cursorY;
+	float cursorA;
+	float cursorB;
+	float cursorC;
+	float cursorD;
+	float cursorE;
+	float cursorF;
+	
+	int xcord, ycord, acord, bcord, ccord, dcord, ecord, fcord;
+	
+	int blockType, blockNumber;
+	float accum, blockState;
+	
+	boolean[][] booleanGrid = new boolean[15][24];
+
+	boolean moveLeft = false;
+	boolean moveLeftOld = false;
+	boolean moveRight = false;
+	boolean moveRightOld = false;
+	boolean moveDown = false;
+	boolean moveDownOld = false;
+	boolean rotateNow = false;
+	boolean rotateNowOld = false;
+	
+	Texture block;
+	float blockW = 20;
+	float blockH = 20;
+	
+	Texture background;
+	float backgroundW = 20;
+	float backgroundH = 20;
+	
+	int gridW = 15;
+	int gridH = 24;
+	
+	int counter = 0;
+	
+	Random rng = new Random();
+	
+	
+	// example tetris grid 
+	// change to custom data type (class/char) to suit your needs
+	int[][] grid = new int[gridW][gridH];
+	
+	@Override
+	public void create () {
+		
+		for(int y = 0; y < gridH; y++) {
+			// go over each column left to right		
+			for(int x = 0; x < gridW; x++) {
+				if(x == 0 || x == gridW - 1 || y == 0 || y == gridH - 1) {
+					grid[x][y] = 1;
+				}
+				else {
+					grid[x][y] = 0;					
+				}
+			}
+		}
+		
+		
+		
+		blockNumber = rng.nextInt(8)+1; //generates a number between 1-8
+		
+		if (blockNumber == 1)	// ---
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX;
+			cursorD = cursorY - 40;
+			blockType = 1;
+			blockState = 1;
+			cursor = new Texture("block1.jpg");
+		}
+		if (blockNumber == 2) 	// :.
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX + 20;
+			cursorD = cursorY - 20;
+			blockType = 1;
+			blockState = 1;
+			cursor = new Texture("block2.jpg");
+		}
+		
+		if (blockNumber == 3)	// ----
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX;
+			cursorD = cursorY - 40;
+			cursorE = cursorX;
+			cursorF = cursorY - 60;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block3.jpg");
+		}
+		if (blockNumber == 4)	// ::
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX + 20;
+			cursorD = cursorY;
+			cursorE = cursorX + 20;
+			cursorF = cursorY - 20;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block4.jpg");
+		}
+		if (blockNumber == 5)	// :..
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX + 20;
+			cursorB = cursorY;
+			cursorC = cursorX;
+			cursorD = cursorY - 20;
+			cursorE = cursorX;
+			cursorF = cursorY - 40;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block5.png");
+		}
+		if (blockNumber == 6)	// ":.
+		{
+			cursorX = 160;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX - 20;
+			cursorD = cursorY - 20;
+			cursorE = cursorX - 20;
+			cursorF = cursorY - 40;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block6.png");
+		}
+		if (blockNumber == 7)	// ..:
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX + 20;
+			cursorB = cursorY;
+			cursorC = cursorX + 20;
+			cursorD = cursorY - 20;
+			cursorE =cursorX + 20;
+			cursorF = cursorY - 40;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block7.png");
+		}
+		if (blockNumber == 8)	// .:"
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX + 20;
+			cursorD = cursorY - 20;
+			cursorE = cursorX + 20;
+			cursorF = cursorY - 40;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block8.png");
+		}
+	
+		
+		batch = new SpriteBatch();
+		block = new Texture("border.jpg");
+		background = new Texture("background.jpg");
+	}
+	
+	 @Override
+    public void dispose() {
+        batch.dispose();
+        cursor.dispose();
+		block.dispose();
+    }
+	 
+
+	@Override
+	public void render () {
+				
+		//counter++;
+		
+		//System.out.println(counter);
+		
+		// update your game
+		// check inputs
+		// move blocks
+		// updated grid (you will need to loop over the grid)
+		
+		// sample input
+        if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        	rotateNow = true;
+        	if (rotateNow && !rotateNowOld){
+        		rotate();
+        	}
+        	rotateNowOld = rotateNow;
+        }
+        rotateNowOld = (Gdx.input.isKeyPressed(Input.Keys.UP));
+        
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+        	moveDown = true;
+        	if (moveDown && !moveDownOld){
+        		cursorY-=20;
+        		cursorB-=20;
+        		cursorD-=20;
+        		cursorF-=20;
+        	}
+        	moveDownOld = moveDown;
+        }
+        moveDownOld = Gdx.input.isKeyPressed(Input.Keys.DOWN); 
+        
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        	if (checkInsideGrid() == true){
+	        	moveLeft = true;
+	        	if (moveLeft && !moveLeftOld){
+	        		cursorX-=20;
+	        		cursorA-=20;
+	        		cursorC-=20;
+	        		cursorE-=20;
+	        	}
+	        	moveLeftOld = moveLeft;
+        	}
+        }
+        moveLeftOld = Gdx.input.isKeyPressed(Input.Keys.LEFT);
+        
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+        	moveRight = true;
+	        if (moveRight && !moveRightOld){
+	       		cursorX+=20;
+	       		cursorA+=20;
+	       		cursorC+=20;
+	       		cursorE+=20;
+	       	}
+	       	moveRightOld = moveRight;
+        }
+        moveRightOld = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+        
+        
+        
+        // render your game
+        // libgdx starts with 0,0 at the bottom left corner
+        // and y increases upwards
+		
+    		// set clear colour and clear screen
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		// do all drawing between batch.begin and end
+		batch.begin();
+		
+		
+		
+		// sample grid drawing
+		// go over each row bottom to top
+		for(int y = 0; y < gridH; y++) {
+			// go over each column left to right		
+			for(int x = 0; x < gridW; x++) {
+				if(grid[x][y] == 1) {
+					batch.draw(block, x * blockW, y * blockH);
+					booleanGrid[x][y] = true;
+				}
+				if(grid[x][y] == 2) {
+					batch.draw(cursor, x * blockW, y * blockH);
+				}
+			}
+		}
+		
+		for (int y = 1; y < gridH-1; y++){
+			for (int x = 1; x < gridW-1; x++){
+				batch.draw(background, x * backgroundW, y * backgroundH);
+			}
+		}
+		
+		// sample image drawing at changing position
+		if (blockType == 1){
+			batch.draw(cursor, cursorX, cursorY);
+			batch.draw(cursor, cursorA, cursorB);
+			batch.draw(cursor, cursorC, cursorD);
+		}
+		if (blockType == 2){
+			batch.draw(cursor, cursorX, cursorY);
+			batch.draw(cursor, cursorA, cursorB);
+			batch.draw(cursor, cursorC, cursorD);
+			batch.draw(cursor, cursorE, cursorF);
+		}
+		
+		accum += Gdx.graphics.getDeltaTime();
+		double limit = 0.75;
+		
+		if (accum > limit)
+		{
+			if (checkInsideGrid() == true){
+				cursorY-=20;
+	    		cursorB-=20;
+	    		cursorD-=20;
+	    		cursorF-=20;
+	    		accum -= limit;
+			}
+			else createBlock();
+		}
+		
+		xcord = (int)cursorX/20;
+		ycord = (int)cursorY/20;
+		acord = (int)cursorA/20;
+		bcord = (int)cursorB/20;
+		ccord = (int)cursorC/20;
+		dcord = (int)cursorD/20;
+		ecord = (int)cursorE/20;
+		fcord = (int)cursorF/20;
+		
+		//System.out.println(xcord + " " + acord + " " + ccord + " " + ecord);
+		// don't forget batch.end
+		batch.end();
+	}
+	
+	@Override
+    public void resize(int width, int height) {
+    }
+
+    @Override
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+    
+    public void rotate(){
+    	
+    	if (blockNumber == 1){
+    		if (blockState/4 == 0.25){
+    			cursorA+=20;
+    			cursorB-=20;
+    			cursorX+=40;
+    			cursorY-=40;
+    		}
+    		
+    		if (blockState/4 == 0.50){
+    			cursorA-=20;
+    			cursorB+=20;
+    			cursorX-=40;
+    			cursorY+=40;
+    		}
+    		
+    		if (blockState/4 == 0.75){
+    			cursorA+=20;
+    			cursorB-=20;
+    			cursorX+=40;
+    			cursorY-=40;
+    		}
+    		if (blockState/4 == 1){
+    			cursorA-=20;
+    			cursorB+=20;
+    			cursorX-=40;
+    			cursorY+=40;
+    			blockState -= 4;
+    		}
+    		blockState++;
+    	}
+  
+    	if (blockNumber == 2){
+    		if (blockState/4 == 0.25){
+    			cursorB+=20;
+    			cursorC-=20;
+    			cursorX+=20;
+    		}
+    		
+    		if (blockState/4 == 0.50){
+    			cursorD+=20;
+    			cursorA+=20;
+    			cursorY-=20;
+    		}
+    		
+    		if (blockState/4 == 0.75){
+    			cursorC+=20;
+    			cursorB-=20;
+    			cursorX-=20;
+    		}
+    		if (blockState/4 == 1){
+    			cursorA-=20;
+    			cursorD-=20;
+    			cursorY+=20;
+    			blockState -= 4;
+    		}
+    		blockState++;
+    	}
+    	
+    	if (blockNumber == 3){
+	    	if (blockState/4 == 0.25){
+				cursorA+=40;
+				cursorB-=40;
+				cursorC+=20;
+				cursorD-=20;
+				cursorX+=60;
+				cursorY-=60;
+			}
+			
+			if (blockState/4 == 0.50){
+				cursorA-=40;
+				cursorB+=40;
+				cursorC-=20;
+				cursorD+=20;
+				cursorX-=60;
+				cursorY+=60;
+			}
+			
+			if (blockState/4 == 0.75){
+				cursorA+=40;
+				cursorB-=40;
+				cursorC+=20;
+				cursorD-=20;
+				cursorX+=60;
+				cursorY-=60;
+			}
+			if (blockState/4 == 1){
+				cursorA-=40;
+				cursorB+=40;
+				cursorC-=20;
+				cursorD+=20;
+				cursorX-=60;
+				cursorY+=60;
+				blockState -= 4;
+			}
+			blockState++;
+		}
+    	
+    	// nothing for block 4
+
+    	if (blockNumber == 5){
+    		if (blockState/4 == 0.25){
+				cursorA+=20;
+				cursorB-=60;
+				cursorC+=20;
+				cursorD-=20;
+				cursorX+=40;
+				cursorY-=40;
+				
+			}
+			
+			if (blockState/4 == 0.50){
+				cursorA-=40;
+				cursorB+=20;
+				cursorD+=20;
+				cursorE+=20;
+				cursorF+=40;
+				cursorX-=20;
+			}
+			
+			if (blockState/4 == 0.75){
+				cursorB+=40;
+				cursorE+=20;
+				cursorF-=20;
+				cursorX-=20;
+				cursorY+=20;
+			}
+			if (blockState/4 == 1){
+				cursorA+=20;
+				cursorC-=20;
+				cursorE-=40;
+				cursorF-=20;
+				cursorY+=20;
+				blockState -= 4;
+			}
+			blockState++;
+    	}
+
+    	if (blockNumber == 6){
+    		if (blockState/4 == 0.25){
+				cursorC+=20;
+				cursorD+=20;
+				cursorF+=40;
+				cursorX+=20;
+				cursorY-=20;
+			}
+			
+			if (blockState/4 == 0.50){
+				cursorC-=20;
+				cursorD-=20;
+				cursorF-=40;
+				cursorX-=20;
+				cursorY+=20;
+			}
+			
+			if (blockState/4 == 0.75){
+				cursorC+=20;
+				cursorD+=20;
+				cursorF+=40;
+				cursorX+=20;
+				cursorY-=20;
+			}
+			if (blockState/4 == 1){
+				cursorC-=20;
+				cursorD-=20;
+				cursorF-=40;
+				cursorX-=20;
+				cursorY+=20;
+				blockState -= 4;
+			}
+			blockState++;
+    	}
+
+    	if (blockNumber == 7){
+    		if (blockState/4 == 0.25){
+				cursorA+=20;
+				cursorB-=20;
+				cursorE-=20;
+				cursorF+=20;
+				cursorX+=40;
+			}
+			
+			if (blockState/4 == 0.50){
+				cursorA-=40;
+				cursorB-=20;
+				cursorC-=20;
+				cursorF+=20;
+				cursorX-=20;
+				cursorY-=40;
+			}
+			
+			if (blockState/4 == 0.75){
+				cursorB+=40;
+				cursorC+=20;
+				cursorD+=20;
+				cursorE+=40;
+				cursorX-=20;
+				cursorY+=20;
+			}
+			if (blockState/4 == 1){
+				cursorA+=20;
+				cursorD-=20;
+				cursorE-=20;
+				cursorF-=40;
+				cursorY+=20;
+				blockState -= 4;
+			}
+			blockState++;
+    	}
+
+    	if (blockNumber == 8){
+    		if (blockState/4 == 0.25){
+				cursorA+=20;
+				cursorB+=20;
+				cursorE-=20;
+				cursorF+=20;
+				cursorX+=40;
+			}
+			
+			if (blockState/4 == 0.50){
+				cursorA-=20;
+				cursorB-=20;
+				cursorE+=20;
+				cursorF-=20;
+				cursorX-=40;
+			}
+			
+			if (blockState/4 == 0.75){
+				cursorA+=20;
+				cursorB+=20;
+				cursorE-=20;
+				cursorF+=20;
+				cursorX+=40;
+			}
+			if (blockState/4 == 1){
+				cursorA-=20;
+				cursorB-=20;
+				cursorE+=20;
+				cursorF-=20;
+				cursorX-=40;
+				blockState -= 4;
+			}
+			blockState++;
+    	}
+    }
+    
+    public void createBlock(){
+    	blockNumber = rng.nextInt(8)+1;
+    	if (blockNumber == 1)	// ---
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX;
+			cursorD = cursorY - 40;
+			blockType = 1;
+			blockState = 1;
+			cursor = new Texture("block1.jpg");
+		}
+		if (blockNumber == 2) 	// :.
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX + 20;
+			cursorD = cursorY - 20;
+			blockType = 1;
+			blockState = 1;
+			cursor = new Texture("block2.jpg");
+		}
+		
+		if (blockNumber == 3)	// ----
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX;
+			cursorD = cursorY - 40;
+			cursorE = cursorX;
+			cursorF = cursorY - 60;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block3.jpg");
+		}
+		if (blockNumber == 4)	// ::
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX + 20;
+			cursorD = cursorY;
+			cursorE = cursorX + 20;
+			cursorF = cursorY - 20;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block4.jpg");
+		}
+		if (blockNumber == 5)	// :..
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX + 20;
+			cursorB = cursorY;
+			cursorC = cursorX;
+			cursorD = cursorY - 20;
+			cursorE = cursorX;
+			cursorF = cursorY - 40;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block5.png");
+		}
+		if (blockNumber == 6)	// ":.
+		{
+			cursorX = 160;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX - 20;
+			cursorD = cursorY - 20;
+			cursorE = cursorX - 20;
+			cursorF = cursorY - 40;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block6.png");
+		}
+		if (blockNumber == 7)	// ..:
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX + 20;
+			cursorB = cursorY;
+			cursorC = cursorX + 20;
+			cursorD = cursorY - 20;
+			cursorE =cursorX + 20;
+			cursorF = cursorY - 40;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block7.png");
+		}
+		if (blockNumber == 8)	// .:"
+		{
+			cursorX = 140;
+			cursorY = 440;		
+			cursorA = cursorX;
+			cursorB = cursorY - 20;
+			cursorC = cursorX + 20;
+			cursorD = cursorY - 20;
+			cursorE = cursorX + 20;
+			cursorF = cursorY - 40;		
+			blockType = 2;
+			blockState = 1;
+			cursor = new Texture("block8.png");
+		}
+    }
+    
+    public boolean checkInsideGrid(){
+    	if (ycord == 1 || bcord == 1 || dcord == 1 || fcord == 1){
+    		return false;
+    	}
+    	if (xcord == 0  || xcord == 14 || acord == 0 || acord == 14 || ccord == 0 || ccord == 14 || ecord == 0 || ecord == 14){
+    		return false;
+    	}
+    	
+    	return true;
+    }
+    
+    public boolean checkRightCollision(){
+    	return false;
+    }
+    
+    public boolean checkLeftCollision(){
+    	return false;
+    }
+
+    public boolean checkDownCollision(){
+    	return false;
+	}
+}
+
+
+
+
+
