@@ -948,6 +948,10 @@ public class MyGdxGame extends ApplicationAdapter {
     	}
     	return false;
     }
+	// check if the game is over, returns true or false
+	public boolean isEnd(){
+		return (score == limit);	
+	}
 }
 	
 
