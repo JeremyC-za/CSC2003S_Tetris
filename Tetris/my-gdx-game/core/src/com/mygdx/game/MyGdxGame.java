@@ -393,8 +393,9 @@ public class MyGdxGame extends ApplicationAdapter {
     @Override
     public void resume() {
     }
-    
-    public void rotate(){ // handles the rotation of the blocks, updating the coordinates of the new locations of the blocks
+	
+    // handles the rotation of the blocks, updating the coordinates of the new locations of the blocks
+    public void rotate(){ 
     	
     	if (blockNumber == 1){
     		if (blockState/4 == 0.25){
@@ -640,8 +641,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			blockState++;
     	}
     }
-    
-    public void createBlock(){	// creates a new block once the old one reaches the bottom.
+	
+    // creates a new block once the old one reaches the bottom.
+    public void createBlock(){	
     	blockNumber = rng.nextInt(6)+3;
     	if (blockNumber == 1)	// ---
 		{
