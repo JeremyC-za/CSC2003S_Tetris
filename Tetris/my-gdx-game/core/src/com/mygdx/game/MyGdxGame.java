@@ -753,8 +753,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			cursor = new Texture("block8.png");
 		}
     }
-    
-    public boolean checkInsideGridY(){ // checks whether a block is inside the grid 
+	
+    // checks whether a block is inside the grid
+    public boolean checkInsideGridY(){  
     	if (blockType == 1){
 	    	if (ycord == 1 || bcord == 1 || dcord == 1 || fcord == 1 || booleanGrid[xcord][ycord-1] == true || booleanGrid[acord][bcord-1] == true || booleanGrid[ccord][dcord-1] == true){
 	    		return false;
@@ -767,7 +768,8 @@ public class MyGdxGame extends ApplicationAdapter {
    	}
     	return true;
     }
-    public boolean checkInsideGridXRight(){ // checks whether a block in inside the grid
+	// checks whether a block in inside the grid
+    public boolean checkInsideGridXRight(){ 
     	if (xcord == 13 || acord == 13 || ccord == 13 || ecord == 13){
     		return false;
     	}
