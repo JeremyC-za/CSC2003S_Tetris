@@ -97,7 +97,7 @@ public class MyGdxGame extends ApplicationAdapter {
 		beep.setVolume((float) 0.1);
 		
 		blockNumber = rng.nextInt(6)+3; //generates a number between 3-8
-		
+		// This seems repetitive, could use a switch case maybe? 
 		if (blockNumber == 1)	// ---
 		{
 			cursorX = 140;
